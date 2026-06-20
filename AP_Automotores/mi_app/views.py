@@ -153,7 +153,7 @@ Porcentaje comprometido: {round(porcentaje, 2)} %
                     cuerpo,
                     settings.DEFAULT_FROM_EMAIL,
                     [solicitud.email],
-                    fail_silently=False,
+                    fail_silently=True,
                 )
                 mensaje_exito = "¡Simulación enviada! Revisá tu correo."
             except Exception:
