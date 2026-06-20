@@ -36,11 +36,21 @@ document.addEventListener('DOMContentLoaded', function () {
       var errKeys       = Object.keys(JSON.parse(erroresData.textContent));
       var camposPlan    = ['modelo_auto', 'precio_auto', 'cantidad_cuotas'];
       var camposGarante = ['garante_nombre', 'garante_dni', 'garante_ingreso',
-                           'garante_antiguedad', 'garante_relacion', 'garante_telefono'];
+                           'garante_antiguedad', 'garante_relacion', 'garante_telefono',
+                           'garante_fecha_nacimiento'];
       if (errKeys.some(function (k) { return camposPlan.indexOf(k) >= 0; })) {
         activarTab('plan');
       } else if (errKeys.some(function (k) { return camposGarante.indexOf(k) >= 0; })) {
         activarTab('garante');
+      } else {
+        activarTab('personal');
+      }
+      // Scroll al formulario para que el usuario vea los errores
+      var formPanel = document.querySelector('.form-panel');
+      if (formPanel) {
+        setTimeout(function () {
+          formPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 50);
       }
     } catch (e) {}
   }

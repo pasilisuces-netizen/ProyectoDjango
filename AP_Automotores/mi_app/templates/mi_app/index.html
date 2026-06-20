@@ -104,7 +104,7 @@
         <div class="financing-layout">
 
             <!-- FORMULARIO -->
-            <div class="form-panel">
+            <div class="form-panel" id="formulario">
                 <form method="POST" id="simulacion-form" novalidate>
                     {% csrf_token %}
                     <input type="hidden" name="cotizacion_dolar" id="cotizacion_dolar_input">
@@ -359,4 +359,12 @@
 
 {% block extra_js %}
 <script src="{% static 'scripts.js' %}"></script>
+{% if form.errors %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var el = document.getElementById('formulario');
+    if (el) setTimeout(function(){ el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+  });
+</script>
+{% endif %}
 {% endblock %}
