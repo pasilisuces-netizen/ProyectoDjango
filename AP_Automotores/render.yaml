@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: ap-automotores
+    name: AP_Automotores
     env: python
     buildCommand: |
       pip install -r requirements.txt &&
@@ -10,3 +10,5 @@ services:
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: AP_Automotores.settings
+      - key: DATABASE_URL
+        value: postgresql://proyectodjango_35u6_user:GCd9Bi2Xo521twmgYowlGJ8tSBNTFlXK@dpg-d8rc0mj7uimc73f0n1ag-a.oregon-postgres.render.com/proyectodjango_35u6
