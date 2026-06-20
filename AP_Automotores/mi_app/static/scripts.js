@@ -268,7 +268,8 @@ document.addEventListener('DOMContentLoaded', function () {
   /* ══════════════════════════════════════════════════════════
      6. VALIDACIÓN DE EDAD (cliente) — 18 mín, máx 78 al finalizar
   ══════════════════════════════════════════════════════════ */
-formSimulacion.addEventListener('submit', function (e) {
+  var formSimulacion = document.getElementById('formSimulacion');
+  if (formSimulacion) formSimulacion.addEventListener('submit', function (e) {
   var erroresCliente = [];
 
   // Validar edad del titular
@@ -301,7 +302,7 @@ formSimulacion.addEventListener('submit', function (e) {
     // Navegar al primer tab con error
     activarTab('personal');
   }
-});
+  });
   /* ══════════════════════════════════════════════════════════
      7. LOGIN / REGISTRO
      Solo se ejecuta si la página tiene la card de autenticación
