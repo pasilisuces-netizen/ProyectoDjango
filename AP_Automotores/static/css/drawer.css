@@ -1,0 +1,194 @@
+/* ═══════════════════════════════════════════════════════════════
+   DRAWER / MENÚ HAMBURGUESA
+   Agregar al final de globalStyles.css
+═══════════════════════════════════════════════════════════════ */
+
+/* ── Botón hamburguesa: animación a X ── */
+.navbar__menu {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: .4rem;
+  z-index: 1000;
+}
+.navbar__menu span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: #e8e6f0;
+  border-radius: 2px;
+  transition: transform .3s ease, opacity .3s ease, width .3s ease;
+  transform-origin: center;
+}
+
+/* Estado activo → X */
+.navbar__menu--active span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.navbar__menu--active span:nth-child(2) {
+  opacity: 0;
+  width: 0;
+}
+.navbar__menu--active span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ── Overlay ── */
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .55);
+  backdrop-filter: blur(3px);
+  z-index: 900;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s ease;
+}
+.drawer-overlay--visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ── Drawer ── */
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 280px;
+  max-width: 85vw;
+  height: 100dvh;
+  background: #1c1b30;
+  border-left: 1px solid rgba(255, 255, 255, .07);
+  z-index: 950;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform .35s cubic-bezier(.4, 0, .2, 1);
+  overflow-y: auto;
+}
+.drawer--open {
+  transform: translateX(0);
+}
+
+/* ── Header del drawer ── */
+.drawer__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem 1.4rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, .07);
+}
+.drawer__logo {
+  height: 28px;
+  width: auto;
+  opacity: .9;
+}
+.drawer__close {
+  background: transparent;
+  border: none;
+  color: #7a7892;
+  cursor: pointer;
+  padding: .3rem;
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+  transition: color .2s, background .2s;
+}
+.drawer__close:hover {
+  color: #e8e6f0;
+  background: rgba(255, 255, 255, .06);
+}
+
+/* ── Cuerpo del drawer ── */
+.drawer__body {
+  display: flex;
+  flex-direction: column;
+  padding: 1.2rem 1rem;
+  gap: .25rem;
+  flex: 1;
+}
+
+/* ── Links del drawer ── */
+.drawer__link {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  padding: .75rem .9rem;
+  border-radius: 8px;
+  color: #b0adcc;
+  text-decoration: none;
+  font-size: .88rem;
+  font-weight: 600;
+  transition: background .2s, color .2s;
+}
+.drawer__link:hover {
+  background: rgba(255, 255, 255, .05);
+  color: #e8e6f0;
+}
+.drawer__link svg { flex-shrink: 0; opacity: .7; }
+
+/* Logout con tono rojo suave */
+.drawer__link--logout {
+  color: #c47a70;
+}
+.drawer__link--logout:hover {
+  background: rgba(167, 83, 69, .1);
+  color: #e07070;
+}
+
+/* ── Divisor ── */
+.drawer__divider {
+  height: 1px;
+  background: rgba(255, 255, 255, .07);
+  margin: .6rem .4rem;
+}
+
+/* ── Usuario logueado ── */
+.drawer__user {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .5rem .9rem;
+  font-size: .78rem;
+  color: #7a7892;
+  letter-spacing: .04em;
+}
+
+/* ── Botones CTA dentro del drawer ── */
+.drawer__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  padding: .75rem 1rem;
+  border-radius: 8px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: .88rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all .22s;
+  margin-top: .2rem;
+  letter-spacing: .02em;
+}
+.drawer__btn--primary {
+  background: #A75345;
+  color: #fff;
+}
+.drawer__btn--primary:hover {
+  background: #8a3e32;
+  transform: translateY(-1px);
+}
+.drawer__btn--ghost {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, .12);
+  color: #b0adcc;
+}
+.drawer__btn--ghost:hover {
+  border-color: rgba(167, 83, 69, .5);
+  color: #e8e6f0;
+}

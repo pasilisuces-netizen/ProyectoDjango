@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Panel interno — AP Automotores{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/mi_app.css' %}">
+<style>
+  .panel-wrap {
+    max-width: 1100px;
+    margin: 2.5rem auto;
+    padding: 0 1.5rem 4rem;
+  }
+
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.75rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e0e0e0;
+  }
+
+  .panel-header h1 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #151424;
+  }
+
+  .panel-badge {
+    background: #151424;
+    color: #fff;
+    font-size: .78rem;
+    font-weight: 600;
+    padding: .35rem .85rem;
+    border-radius: 20px;
+    letter-spacing: .04em;
+  }
+
+  /* Tabla */
+  .tabla-wrap {
+    overflow-x: auto;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .82rem;
+  }
+
+  thead {
+    background: #151424;
+    color: #fff;
+  }
+
+  thead th {
+    padding: .75rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    letter-spacing: .03em;
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid #f0f0f0;
+    transition: background .15s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover      { background: #f9f9fb; }
+
+  tbody td {
+    padding: .7rem 1rem;
+    color: #333;
+    vertical-align: top;
+  }
+
+  .td-modelo {
+    font-weight: 600;
+    color: #151424;
+  }
+
+  .td-cuota {
+    font-weight: 700;
+    color: #A75345;
+    white-space: nowrap;
+  }
+
+  .td-pct {
+    font-weight: 600;
+  }
+
+  .td-pct--ok   { color: #2e7d32; }
+  .td-pct--warn { color: #f57c00; }
+  .td-pct--bad  { color: #c62828; }
+
+  .badge-rel {
+    display: inline-block;
+    font-size: .7rem;
+    padding: .2rem .55rem;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .badge-rel--dep   { background: #e3f2fd; color: #1565c0; }
+  .badge-rel--indep { background: #fff3e0; color: #e65100; }
+
+  .td-fecha {
+    font-size: .75rem;
+    color: #777;
+    white-space: nowrap;
+  }
+
+  /* Estado vacío */
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #999;
+  }
+
+  .empty-state p { font-size: .95rem; margin-top: .5rem; }
+
+  /* Barra superior con enlace a API */
+  .api-link {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    font-size: .78rem;
+    font-weight: 600;
+    color: #151424;
+    text-decoration: none;
+    border: 1.5px solid #151424;
+    padding: .35rem .85rem;
+    border-radius: 6px;
+    transition: background .2s, color .2s;
+  }
+  .api-link:hover {
+    background: #151424;
+    color: #fff;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="padding-top: 80px;"></div>
+
+<div class="panel-wrap">
+
+  <div class="panel-header">
+    <div>
+      <h1>Panel interno — Solicitudes recibidas</h1>
+      <p style="font-size:.82rem; color:#666; margin-top:.3rem;">
+        Solo visible para administradores
+      </p>
+    </div>
+    <div style="display:flex; gap:.75rem; align-items:center;">
+      <a href="/api/solicitudes/" class="api-link" target="_blank">
+        Ver API JSON
+      </a>
+      <span class="panel-badge">{{ solicitudes.count }} solicitud{{ solicitudes.count|pluralize:"es" }}</span>
+    </div>
+  </div>
+
+  {% if solicitudes %}
+  <div class="tabla-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Fecha</th>
+          <th>Titular</th>
+          <th>Email</th>
+          <th>Vehículo</th>
+          <th>Precio</th>
+          <th>Cuotas</th>
+          <th>Cuota mensual</th>
+          <th>% ingreso</th>
+          <th>Garante</th>
+          <th>Rel. laboral</th>
+          <th>Ingreso garante</th>
+          <th>Cotiz. USD</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in solicitudes %}
+        <tr>
+          <td>{{ s.id }}</td>
+          <td class="td-fecha">{{ s.fecha_solicitud|date:"d/m/Y H:i" }}</td>
+          <td>
+            <strong>{{ s.nombre }} {{ s.apellido }}</strong><br>
+            <span style="font-size:.72rem; color:#888;">{{ s.telefono|default:"—" }}</span>
+          </td>
+          <td>{{ s.email }}</td>
+          <td class="td-modelo">{{ s.modelo_auto }}</td>
+          <td>${{ s.precio_auto|floatformat:0 }}</td>
+          <td style="text-align:center;">{{ s.cantidad_cuotas }}</td>
+          <td class="td-cuota">${{ s.cuota_mensual|floatformat:0 }}</td>
+          <td>
+            {% with pct=s.porcentaje_ingreso %}
+              {% if pct <= 25 %}
+                <span class="td-pct td-pct--ok">{{ pct }}%</span>
+              {% elif pct <= 35 %}
+                <span class="td-pct td-pct--warn">{{ pct }}%</span>
+              {% else %}
+                <span class="td-pct td-pct--bad">{{ pct }}%</span>
+              {% endif %}
+            {% endwith %}
+          </td>
+          <td>
+            {{ s.garante_nombre }}<br>
+            <span style="font-size:.72rem; color:#888;">DNI {{ s.garante_dni }}</span>
+          </td>
+          <td>
+            {% if s.garante_relacion == "dependencia" %}
+              <span class="badge-rel badge-rel--dep">Dependencia</span>
+            {% else %}
+              <span class="badge-rel badge-rel--indep">Independiente</span>
+            {% endif %}
+          </td>
+          <td>${{ s.garante_ingreso|floatformat:0 }}</td>
+          <td>
+            {% if s.cotizacion_dolar %}
+              ${{ s.cotizacion_dolar|floatformat:2 }}
+            {% else %}
+              <span style="color:#bbb;">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% else %}
+  <div class="empty-state">
+    <span style="font-size:2.5rem;">📋</span>
+    <p>Todavía no hay solicitudes registradas.</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,362 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}AP Automotores{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'indexStyles.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+    <div class="hero__overlay"></div>
+    <div class="hero__text">
+        <h1>Tu camino empieza<br><span>AHORA</span></h1>
+    </div>
+</section>
+
+<main class="main">
+
+    <!-- PASO 1 -->
+    <section class="step" id="step-1">
+        <h2 class="step__title"><span class="step__number">1. </span>Elige tu modelo</h2>
+        <div class="cars-grid">
+
+            <div class="car-card" data-model="Fiat Mobi" data-price="12000000"
+                 data-img="{% static 'images/fiat_mobi.png' %}">
+                <div class="car-card__img"><img src="{% static 'images/fiat_mobi.png' %}" alt="Fiat Mobi"></div>
+                <p class="car-card__name">Fiat Mobi</p>
+                <p class="car-card__price">Desde <strong>$12.000.000</strong></p>
+                <button class="btn btn--outline car-select-btn" type="button">Seleccionar</button>
+            </div>
+
+            <div class="car-card" data-model="Volkswagen Polo" data-price="20000000"
+                 data-img="{% static 'images/polo-removebg-preview.png' %}">
+                <div class="car-card__img"><img src="{% static 'images/polo-removebg-preview.png' %}"
+                                                alt="Volkswagen Polo"></div>
+                <p class="car-card__name">Volkswagen Polo</p>
+                <p class="car-card__price">Desde <strong>$20.000.000</strong></p>
+                <button class="btn btn--outline car-select-btn" type="button">Seleccionar</button>
+            </div>
+
+            <div class="car-card" data-model="Toyota Corolla" data-price="35000000"
+                 data-img="{% static 'images/toyota-removebg-preview.png' %}">
+                <div class="car-card__img"><img src="{% static 'images/toyota-removebg-preview.png' %}"
+                                                alt="Toyota Corolla"></div>
+                <p class="car-card__name">Toyota Corolla</p>
+                <p class="car-card__price">Desde <strong>$35.000.000</strong></p>
+                <button class="btn btn--outline car-select-btn" type="button">Seleccionar</button>
+            </div>
+
+            <div class="car-card" data-model="BMW Serie 3" data-price="75000000"
+                 data-img="{% static 'images/bmw-removebg-preview.png' %}">
+                <div class="car-card__img"><img src="{% static 'images/bmw-removebg-preview.png' %}" alt="BMW Serie 3">
+                </div>
+                <p class="car-card__name">BMW Serie 3</p>
+                <p class="car-card__price">Desde <strong>$75.000.000</strong></p>
+                <button class="btn btn--outline car-select-btn" type="button">Seleccionar</button>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- PASO 2 -->
+    <section class="step" id="step-2">
+        <h2 class="step__title"><span class="step__number">2. </span>Verifica los requisitos</h2>
+        <div class="requisitos-grid">
+            <div class="requisitos-box">
+                <h3 class="requisitos-box__title">Requisitos del Titular para calificar:</h3>
+                <ul>
+                    <li><span class="check">✓</span> Tener, como mínimo, 18 años</li>
+                    <li><span class="check">✓</span> Tener, como máximo, 75 años al finalizar el plan</li>
+                    <li><span class="check">✓</span> Presentar un garante</li>
+                </ul>
+            </div>
+            <div class="requisitos-box">
+                <h3 class="requisitos-box__title">Requisitos del Garante:</h3>
+                <ul>
+                    <li><span class="check">✓</span> Tener, como mínimo, 18 años</li>
+                    <li><span class="check">✓</span> Antigüedad mínima: 1 año (dependencia) o 2 años (independiente)
+                    </li>
+                    <li><span class="check">✓</span> Tener un ingreso neto mayor a 4 veces el valor de la cuota</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- PASO 3 -->
+    <section class="step" id="step-3">
+        <h2 class="step__title"><span class="step__number">3. </span>Define tu financiamiento</h2>
+
+        {% if mensaje_exito %}
+        <div class="success-message">{{ mensaje_exito }}</div>
+        {% endif %}
+
+        {% if resultado %}
+        <div class="resultado-box">
+            <h3>Resultado de la simulación</h3>
+            <p>Cuota mensual estimada: <strong>${{ resultado.cuota }}</strong></p>
+            <p>Porcentaje del ingreso comprometido: <strong>{{ resultado.porcentaje }}%</strong></p>
+        </div>
+        {% endif %}
+
+        <div class="financing-layout">
+
+            <!-- FORMULARIO -->
+            <div class="form-panel">
+                <form method="POST" id="simulacion-form" novalidate>
+                    {% csrf_token %}
+                    <input type="hidden" name="cotizacion_dolar" id="cotizacion_dolar_input">
+
+                    {% if form.non_field_errors %}
+                    <div class="form-error form-error--general">
+                        {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {# FIX Bug JSON: usar list|join en vez de .keys directamente #}
+                    {% if form.errors %}
+                    {{ form.errors|json_script:"form-errors-data" }}
+                    {% endif %}
+
+                    <!-- TABS -->
+                    <div class="tabs">
+                        <button class="tab tab--active" type="button" data-tab="personal">Datos personales</button>
+                        <button class="tab" type="button" data-tab="garante">Datos del garante</button>
+                        <button class="tab" type="button" data-tab="plan">Datos del plan</button>
+                    </div>
+
+                    <!-- Tab: Datos personales -->
+                    <div class="tab-content tab-content--active" id="tab-personal">
+                        <p class="form-subtitle">Completa el formulario</p>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nombre</label>
+                                {{ form.nombre }}
+                                {% if form.nombre.errors %}
+                                <div class="form-error">{{ form.nombre.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label>Apellido</label>
+                                {{ form.apellido }}
+                                {% if form.apellido.errors %}
+                                <div class="form-error">{{ form.apellido.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="form-row form-row--single">
+                            <div class="form-group">
+                                <label>Fecha de nacimiento <span style="color:var(--bordo)">*</span></label>
+                                {{ form.fecha_nacimiento }}
+                                <span class="form-error" id="error-fecha-nacimiento"></span>
+                                {% if form.fecha_nacimiento.errors %}
+                                <div class="form-error">{{ form.fecha_nacimiento.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Email</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                <div class="form-error">{{ form.email.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label>Teléfono</label>
+                                {{ form.telefono }}
+                                {% if form.telefono.errors %}
+                                <div class="form-error">{{ form.telefono.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="form-row form-row--single">
+                            <div class="form-group">
+                                <label>Ingreso mensual ($)</label>
+                                {{ form.ingreso_mensual }}
+                                <small class="dolar-info" id="info-ingreso"></small>
+                                {% if form.ingreso_mensual.errors %}
+                                <div class="form-error">{{ form.ingreso_mensual.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="tab-nav">
+                            <button type="button" class="tab-nav-btn tab-next" data-next="garante">Siguiente →</button>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Datos del garante -->
+                    <div class="tab-content" id="tab-garante">
+                        <p class="form-subtitle">Datos del garante</p>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nombre</label>
+                                {{ form.garante_nombre }}
+                                {% if form.garante_nombre.errors %}
+                                <div class="form-error">{{ form.garante_nombre.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="id_garante_fecha_nacimiento">Fecha de nacimiento del garante</label>
+                                {{ form.garante_fecha_nacimiento }}
+                                {% if form.garante_fecha_nacimiento.errors %}
+                                <div class="form-error">{{ form.garante_fecha_nacimiento.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label>DNI</label>
+                                {{ form.garante_dni }}
+                                {% if form.garante_dni.errors %}
+                                <div class="form-error">{{ form.garante_dni.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Ingresos Mensuales ($)</label>
+                                {{ form.garante_ingreso }}
+                                <small class="dolar-info" id="info-garante-ingreso"></small>
+                                {% if form.garante_ingreso.errors %}
+                                <div class="form-error">{{ form.garante_ingreso.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label>Antigüedad laboral</label>
+                                {{ form.garante_antiguedad }}
+                                {% if form.garante_antiguedad.errors %}
+                                <div class="form-error">{{ form.garante_antiguedad.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Relación laboral</label>
+                                {{ form.garante_relacion }}
+                                {% if form.garante_relacion.errors %}
+                                <div class="form-error">{{ form.garante_relacion.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label>Teléfono del garante</label>
+                                {{ form.garante_telefono }}
+                                {% if form.garante_telefono.errors %}
+                                <div class="form-error">{{ form.garante_telefono.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="tab-nav">
+                            <button type="button" class="tab-nav-btn tab-prev" data-prev="personal">← Anterior</button>
+                            <button type="button" class="tab-nav-btn tab-next" data-next="plan">Siguiente →</button>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Datos del plan -->
+                    <div class="tab-content" id="tab-plan">
+                        <p class="form-subtitle">Datos del plan</p>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Modelo</label>
+                                {{ form.modelo_auto }}
+                                {% if form.modelo_auto.errors %}
+                                <div class="form-error">{{ form.modelo_auto.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label>Precio del vehículo ($)</label>
+                                {{ form.precio_auto }}
+                                <small class="dolar-info" id="info-precio"></small>
+                                {% if form.precio_auto.errors %}
+                                <div class="form-error">{{ form.precio_auto.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="form-row form-row--single">
+                            <div class="form-group">
+                                <label>Cantidad de cuotas</label>
+                                {{ form.cantidad_cuotas }}
+                                {% if form.cantidad_cuotas.errors %}
+                                <div class="form-error">{{ form.cantidad_cuotas.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="tab-nav">
+                            <button type="button" class="tab-nav-btn tab-prev" data-prev="garante">← Anterior</button>
+                        </div>
+
+                        <button type="submit"  id="btn-enviar" class="simulate-btn">Simular plan</button>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- INFORME -->
+            <div class="informe-panel">
+                <h3 class="informe-panel__title">Informe de financiamiento</h3>
+
+                <div class="informe-car-row">
+                    <div>
+                        <p class="informe-label">Vehículo Escogido</p>
+                        <p class="informe-car-name" id="informe-car-name">—</p>
+                        <p class="informe-car-price" id="informe-car-price">—</p>
+                    </div>
+                    <div class="informe-car-thumb">
+                        <img id="informe-car-img" src="" alt=""
+                             style="display:none; max-width:100px; max-height:68px; object-fit:contain;">
+                    </div>
+                </div>
+
+                <div class="informe-divider"></div>
+
+                <div class="informe-row">
+                    <span>Cantidad de Cuotas</span>
+                    <span id="informe-cuotas">—</span>
+                </div>
+                <div class="informe-row">
+                    <span>Ingreso titular</span>
+                    <span id="informe-ingreso">—</span>
+                </div>
+                <div class="informe-row">
+                    <span>Ingreso garante</span>
+                    <span id="informe-garante-ingreso">—</span>
+                </div>
+                <div class="informe-row">
+                    <span>Tasa de interés</span>
+                    <span>14,50%</span>
+                </div>
+
+                <div class="informe-divider"></div>
+
+                <div class="informe-row informe-row--total">
+                    <span>Valor Final de la Cuota Mensual</span>
+                    <span class="informe-total-value" id="informe-cuota">—</span>
+                </div>
+                <div class="informe-row">
+                    <span>% del ingreso comprometido</span>
+                    <span id="informe-porcentaje">—</span>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+</main>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'scripts.js' %}"></script>
+{% endblock %}
