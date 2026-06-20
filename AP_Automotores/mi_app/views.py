@@ -147,23 +147,36 @@ Porcentaje comprometido: {round(porcentaje, 2)} %
 ================================
 """
 
-            try:
-                send_mail(
-                    asunto,
-                    cuerpo,
-                    settings.DEFAULT_FROM_EMAIL,
-                    [solicitud.email],
-                    fail_silently=True,
-                )
-                mensaje_exito = "¡Simulación enviada! Revisá tu correo."
-            except Exception:
-                mensaje_exito = "Solicitud guardada. Hubo un problema al enviar el email."
+            # EMAIL DESACTIVADO TEMPORALMENTE
+            # try:
+            #     send_mail(
+            #         asunto,
+            #         cuerpo,
+            #         settings.DEFAULT_FROM_EMAIL,
+            #         [solicitud.email],
+            #         fail_silently=False,
+            #     )
+            #     mensaje_exito = "¡Simulación enviada! Revisá tu correo."
+            # except Exception:
+            #     mensaje_exito = "Solicitud guardada. Hubo un problema al enviar el email."
+            mensaje_exito = "¡Solicitud enviada con éxito! Nos pondremos en contacto pronto."
 
             # Limpiar el formulario después del éxito
             # form = SolicitudForm()
 
     else:
         form = SolicitudForm()
+
+    # Si hay errores, redirigir al anchor del formulario para no quedar arriba de la página
+    if form.errors:
+        from django.shortcuts import redirect as _redirect
+        request.session['_form_errors'] = True
+        return render(request, "mi_app/index.html", {
+            "form": form,
+            "mensaje_exito": mensaje_exito,
+            "resultado": resultado,
+            "scroll_to_form": True,
+        })
 
     return render(request, "mi_app/index.html", {
         "form": form,
